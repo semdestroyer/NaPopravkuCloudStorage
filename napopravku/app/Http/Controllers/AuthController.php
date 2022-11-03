@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -14,10 +16,11 @@ class AuthController extends Controller
     }
     /**
      */
-    function signUp(Request $request)
+    function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'login' => 'required|string|between:2,100',
+            'name' => 'required|string|between:2,100',
+            'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|confirmed|min:6',
         ]);
         if($validator->fails()){
@@ -27,6 +30,7 @@ class AuthController extends Controller
             $validator->validated(),
             ['password' => bcrypt($request->password)]
         ));
+        Storage::makeDirectory($user->id);
         return response()->json([
             'message' => 'User successfully registered',
             'user' => $user

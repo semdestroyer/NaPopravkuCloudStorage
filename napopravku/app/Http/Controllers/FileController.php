@@ -3,15 +3,21 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\FileCleaning;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use function PHPUnit\Framework\isEmpty;
 
 class FileController extends Controller
 {
+    public function __construct() {
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -29,97 +35,138 @@ class FileController extends Controller
      */
     public function upload(Request $request)
     {
-        if($request->file('file')->getSize() >= 20 * pow(2,20))
-        {
+        if ($request->file('file')->getSize() >= 20 * pow(2, 20)) {
             return response("File larger than 20mb", Response::HTTP_BAD_REQUEST);
         }
-        if($request->file('file')->extension() != "php")
-        {
+        if ($request->file('file')->extension() == "php") {
             return response("Php extension is not allowed", Response::HTTP_BAD_REQUEST);
         }
-        if($this->userFilesSize() >= 100 * pow(2,20))
-        {
+        if ($this->userFilesSize() >= 100 * pow(2, 20)) {
             return response("User file limit exceeded", Response::HTTP_BAD_REQUEST);
         }
-        Storage::disk('local')->put(Auth::user()->name . '/' . $request->file('file')->getFilename());
+        Storage::disk('local')->put(Auth::user()->id . '/' . $request->file('file')->getClientOriginalName(),
+            $request->file('file')->getContent());
     }
 
     public function createDirectory(Request $request)
     {
-        File::makeDirectory($request->folder_name);
+        $validator = Validator::make($request->all(), [
+            'directory' => 'required|string',
+        ]);
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        if(str_contains($validator->validated()['directory'],'/'))
+        {
+            return response('subdirectory not allowed', 400);
+        }
+
+        Storage::disk('local')->makeDirectory($validator->validated()['directory']);
     }
 
     public function download(Request $request)
     {
-
+        if($this->isFileRelevant(Auth::user()->id . '/' . $request->file('file')->getFilename())){
+            return Storage::disk('local')->get(Auth::user()->id . '/' . $request->file('file')->getFilename());
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function showUserFiles()
     {
-        //
+        $result = [];
+        $files = Storage::disk('local')->allFiles(Auth::user()->id);
+        foreach ($files as $file) {
+            array_push($result, substr($file, strpos($file, '/', 1)));
+        }
+        return response()->json(['files' => $result]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function rename(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|string',
+            'new_file' => 'required|string',
+        ]);
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+        Storage::disk('local')->move(Auth::user()->id . '/' . $validator->validated()['file'],
+            Auth::user()->id . '/' . $validator->validated()['new_file']);
+        return response("file successfully renamed",200);
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function delete(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|string',
+        ]);
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+        if(!Storage::disk('local')->exists(Auth::user()->id . '/' . $validator->validated()['file']))
+        {
+            return response("file not exists",400);
+        }
+
+        Storage::disk('local')->delete(Auth::user()->id . '/' . $validator->validated()['file']);
+        return response("file successfully delete",200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
     public function getUserFilesSize()
     {
-        return $this->getUserFilesSize();
-    }
-    public function getUserFilesSizeInsideDirectory()
-    {
-
+        return response()->json([
+            'size' => $this->userFilesSize()
+        ]);
     }
 
-    protected function userFilesSize()
+    public function getUserFilesSizeInsideDirectory(Request $request)
     {
+        $result = 0;
+        $files = Storage::disk('local')->allFiles(Auth::user()->id . '/' . $request->input('directory'));
+        foreach ($files as $file)
+        {
+            $result += Storage::disk('local')->size($file);
+        }
+        return response()->json([
+            'size' => $result
+        ]);
+    }
 
+    private function userFilesSize()
+    {
+        $result = 0;
+        $files = Storage::disk('local')->allFiles(Auth::user()->id);
+        foreach ($files as $file)
+        {
+            $result += Storage::disk('local')->size($file);
+        }
+        return $result;
+
+    }
+
+    private function isFileRelevant(string $filename):bool
+    {
+        $file = FileCleaning::Where('filename', $filename)->first();
+        if(isEmpty($file))
+        {
+            return false;
+        }
+        if($file->createdAt <= $file->deleteAt)
+        {
+            return false;
+        }
+        return true;
     }
 }

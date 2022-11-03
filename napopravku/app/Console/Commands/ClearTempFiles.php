@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Models\FileCleaning;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Storage;
 
 class ClearTempFiles extends Command
 {
@@ -11,7 +13,7 @@ class ClearTempFiles extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'cloud:cleanFiles';
 
     /**
      * The console command description.
@@ -27,6 +29,15 @@ class ClearTempFiles extends Command
      */
     public function handle()
     {
+        $files = FileCleaning::all();
+        foreach ($files as $file)
+        {
+            if($file->createdAt <= $file->deleteAt)
+            {
+                Storage::disk('local')->delete($file->path);
+                $file->delete();
+            }
+        }
         return Command::SUCCESS;
     }
 }
