@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use function PHPUnit\Framework\isEmpty;
@@ -67,8 +68,16 @@ class FileController extends Controller
 
     public function download(Request $request)
     {
-        if($this->isFileRelevant(Auth::user()->id . '/' . $request->file('file')->getFilename())){
-            return Storage::disk('local')->get(Auth::user()->id . '/' . $request->file('file')->getFilename());
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|string',
+        ]);
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+        if($this->isFileRelevant(Auth::user()->id . '/' . $validator->validated()['file'])){
+            return response()->download(
+                Storage::disk('local')->get(Auth::user()->id . '/' . $validator->validated()['file'])
+            );
         }
     }
 
@@ -122,6 +131,17 @@ class FileController extends Controller
 
         Storage::disk('local')->delete(Auth::user()->id . '/' . $validator->validated()['file']);
         return response("file successfully delete",200);
+    }
+
+    public function generateFilePublicLink(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|string',
+        ]);
+        $hash = Hash::make($validator->validated()['file']);
+
+        return Storage::disk('public')->put($hash . '/' . $validator->validated()['file'],
+            Storage::disk('local')->get($validator->validated()['file']));
     }
 
     public function getUserFilesSize()

@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('cloud:cleanFiles')->everyTenMinutes();
         // $schedule->command('inspire')->hourly();
     }
 

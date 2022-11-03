@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\FileCleaning;
+use App\Models\FileUrl;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -34,8 +35,10 @@ class ClearTempFiles extends Command
         {
             if($file->createdAt <= $file->deleteAt)
             {
+                $fileUrl = FileUrl::where('path', $file->path)->first();
                 Storage::disk('local')->delete($file->path);
                 $file->delete();
+                $fileUrl->delete();
             }
         }
         return Command::SUCCESS;

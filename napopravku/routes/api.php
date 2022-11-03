@@ -42,4 +42,5 @@ Route::group([
     Route::get('/user/size/directory', [FileController::class, 'getUserFilesSizeInsideDirectory']);
     Route::get('/user/size', [FileController::class, 'getUserFilesSize']);
     Route::get('/user/files', [FileController::class, 'showUserFiles']);
+    Route::get('url', [FileController::class, 'getPublicFileLink']);
 });
