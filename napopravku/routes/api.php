@@ -37,10 +37,12 @@ Route::group([
 ], function ($router) {
     Route::post('/upload', [FileController::class, 'upload']);
     Route::get('/download', [FileController::class, 'download']);
+    Route::POST('/rename', [FileController::class, 'rename']);
     Route::post('/create/directory', [FileController::class, 'createDirectory']);
     Route::post('/delete/file', [FileController::class, 'delete']);
     Route::get('/user/size/directory', [FileController::class, 'getUserFilesSizeInsideDirectory']);
     Route::get('/user/size', [FileController::class, 'getUserFilesSize']);
     Route::get('/user/files', [FileController::class, 'showUserFiles']);
-    Route::get('url', [FileController::class, 'getPublicFileLink']);
+    Route::post('/generate/url', [FileController::class, 'generateFilePublicLink']);
+    Route::get('/{id}', [FileController::class, 'getPublicFile']);
 });

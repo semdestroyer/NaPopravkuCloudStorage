@@ -14,4 +14,6 @@ use Illuminate\Database\Eloquent\Model;
 class FileCleaning extends Model
 {
     use HasFactory;
+
+    protected $table = 'file_cleanings';
 }

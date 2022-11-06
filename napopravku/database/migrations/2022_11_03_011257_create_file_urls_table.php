@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('file_urls', function (Blueprint $table) {
             $table->id();
+            $table->string('path');
+            $table->string('url')->unique();
             $table->timestamps();
         });
     }

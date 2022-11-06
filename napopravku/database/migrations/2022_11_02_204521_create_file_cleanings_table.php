@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('file_cleanings', function (Blueprint $table) {
             $table->id();
             $table->string('path');
-            $table->date('deleteAt');
+            $table->dateTimeTz('deleteAt');
             $table->timestamps();
         });
     }

@@ -12,4 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 class FileUrl extends Model
 {
     use HasFactory;
+
+    protected $table = 'file_urls';
 }

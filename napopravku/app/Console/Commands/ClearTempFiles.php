@@ -14,7 +14,7 @@ class ClearTempFiles extends Command
      *
      * @var string
      */
-    protected $signature = 'cloud:cleanFiles';
+    protected $signature = 'cloud:clean';
 
     /**
      * The console command description.
@@ -33,12 +33,14 @@ class ClearTempFiles extends Command
         $files = FileCleaning::all();
         foreach ($files as $file)
         {
-            if($file->createdAt <= $file->deleteAt)
+            if(strtotime('now') >= strtotime($file->deleteAt))
             {
                 $fileUrl = FileUrl::where('path', $file->path)->first();
                 Storage::disk('local')->delete($file->path);
                 $file->delete();
-                $fileUrl->delete();
+                if(!empty($fileUrl)) {
+                    $fileUrl->delete();
+                }
             }
         }
         return Command::SUCCESS;
