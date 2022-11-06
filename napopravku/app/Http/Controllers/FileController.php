@@ -2,22 +2,16 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\FileCleaning;
 use App\Models\FileUrl;
-use Carbon\Traits\Date;
-use Faker\Core\DateTime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use function PHPUnit\Framework\isEmpty;
 
 class FileController extends Controller
 {
@@ -28,6 +22,8 @@ class FileController extends Controller
 
 
     /**
+     * Функция для загрузки файла
+     *
      * @param Request $request
      * @return JsonResponse
      */
@@ -70,6 +66,8 @@ class FileController extends Controller
     }
 
     /**
+     * Функция для создания директории
+     *
      * @param Request $request
      * @return JsonResponse
      * @throws ValidationException
@@ -99,6 +97,8 @@ class FileController extends Controller
     }
 
     /**
+     * Функция для скачивания своих файлов
+     *
      * @param Request $request
      * @return JsonResponse|BinaryFileResponse
      * @throws ValidationException
@@ -119,15 +119,16 @@ class FileController extends Controller
             );
         }
         return response()->json([
-            'result' => 'file not exist'
+                'result' => 'file not exist'
             ]
         );
     }
 
 
     /**
-     * Display the specified resource.
+     * Функция для просмотра всех файлов на диске
      *
+     * @return JsonResponse
      */
     public function showUserFiles(): JsonResponse
     {
@@ -140,8 +141,10 @@ class FileController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Функция для переименования файлов
      *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function rename(Request $request): JsonResponse
     {
@@ -164,6 +167,11 @@ class FileController extends Controller
     }
 
     /**
+     * Функция для удаления файлов
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
      */
     public function delete(Request $request): JsonResponse
     {
@@ -183,8 +191,10 @@ class FileController extends Controller
     }
 
     /**
+     * Функция для генерации публичных ссылок на файл
+     *
      * @param Request $request
-     * @return bool
+     * @return JsonResponse
      * @throws ValidationException
      */
     public function generateFilePublicLink(Request $request): JsonResponse
@@ -203,36 +213,46 @@ class FileController extends Controller
         ]);
     }
 
-    function getPublicFile($id, Request $request)
+    /**
+     * Функция для получения публичного файла по хэшу
+     *
+     * @param $id
+     * @param Request $request
+     * @return JsonResponse|BinaryFileResponse
+     * @throws ValidationException
+     */
+    function getPublicFile($id, Request $request): JsonResponse|BinaryFileResponse
     {
         $validator = Validator::make($request->all(), [
             'file' => 'required|string',
         ]);
 
         $file = FileUrl::where('url', $id)->first();
-        if(empty($file))
-        {
+        if (empty($file)) {
             return response()->json([
                 'result' => 'file not exist'
             ], 400);
         }
-        if(!Storage::disk('local')->exists($file->path))
-        {
+        if (!Storage::disk('local')->exists($file->path)) {
             return response()->json([
                 'result' => 'file not exist'
             ], 400);
         }
 
         if ($this->isFileRelevant(Auth::user()->id . '/' . $validator->validated()['file'])) {
-        return response()->download(
-            Storage::disk('local')->path($file->path)
-        );
+            return response()->download(
+                Storage::disk('local')->path($file->path)
+            );
         }
-
+        return response()->json([
+            'result' => 'file not exist'
+        ], 400);
 
     }
 
     /**
+     * Функция для получения объема файлов пользователя(http)
+     *
      * @return JsonResponse
      */
     public function getUserFilesSize(): JsonResponse
@@ -243,6 +263,8 @@ class FileController extends Controller
     }
 
     /**
+     * Функция для получения объема файлов пользователя внутри директории
+     *
      * @param Request $request
      * @return JsonResponse
      */
@@ -259,6 +281,8 @@ class FileController extends Controller
     }
 
     /**
+     * Функция для получения объема файлов пользователя(int)
+     *
      * @return int
      */
     private function userFilesSize(): int
@@ -273,6 +297,8 @@ class FileController extends Controller
     }
 
     /**
+     * Функция для проверки актуальности файла
+     *
      * @param string $filename
      * @return bool
      */
@@ -282,8 +308,7 @@ class FileController extends Controller
         if (empty($file)) {
             return false;
         }
-        if(strtotime('now') >= strtotime($file->deleteAt))
-        {
+        if (strtotime('now') >= strtotime($file->deleteAt)) {
 
             return false;
         }

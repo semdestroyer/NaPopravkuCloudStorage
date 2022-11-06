@@ -3,20 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function __construct() {
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
+
     /**
+     * Функция для регистрации
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
      */
-    function register(Request $request)
+    function register(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|between:2,100',
@@ -37,10 +43,14 @@ class AuthController extends Controller
         ], 201);
     }
 
-
     /**
+     * Функция для логина(получения jwt токена)
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
      */
-    function login(Request $request)
+    function login(Request $request): JsonResponse
     {
         $request->input("login");
         $request->input("password");
@@ -57,18 +67,33 @@ class AuthController extends Controller
         return $this->createNewToken($token);
     }
 
-
     /**
+     * Функция для разлогина
+     *
+     * @return JsonResponse
      */
-    function logout()
+    function logout(): JsonResponse
     {
         auth()->logout();
         return response()->json(['message' => 'User successfully signed out']);
     }
-    public function refresh() {
+
+    /**
+     * Функция для обновления токена
+     *
+     * @return JsonResponse
+     */
+    public function refresh(): JsonResponse {
         return $this->createNewToken(auth()->refresh());
     }
-    protected function createNewToken($token){
+
+    /**
+     * Функция для создания токена
+     *
+     * @param $token
+     * @return JsonResponse
+     */
+    protected function createNewToken($token): JsonResponse{
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
@@ -76,7 +101,13 @@ class AuthController extends Controller
             'user' => auth()->user()
         ]);
     }
-    public function userProfile() {
+
+    /**
+     * Функция для возврата данных о профиле
+     *
+     * @return JsonResponse
+     */
+    public function userProfile(): JsonResponse {
         return response()->json(auth()->user());
     }
 }
