@@ -18,7 +18,7 @@
 							"formdata": [
 								{
 									"key": "email",
-									"value": "arseniidev@goy4.com",
+									"value": "test@example.com",
 									"type": "default"
 								},
 								{
@@ -33,7 +33,7 @@
 								},
 								{
 									"key": "name",
-									"value": "arsenii",
+									"value": "test",
 									"type": "default"
 								}
 							]
@@ -74,7 +74,7 @@
 							"formdata": [
 								{
 									"key": "email",
-									"value": "arseniidev@goy3.com",
+									"value": "test@example.com",
 									"type": "default"
 								},
 								{
@@ -184,12 +184,18 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/C:/Users/User/Downloads/6MFyDlPdnLI.jpg"
+									"src": []
 								},
 								{
 									"key": "delay",
 									"value": "2022-11-07T01:47:51",
 									"type": "default"
+								},
+								{
+									"key": "directory",
+									"value": "",
+									"type": "default",
+									"disabled": true
 								}
 							]
 						},
@@ -304,7 +310,7 @@
 							"urlencoded": [
 								{
 									"key": "directory",
-									"value": "2",
+									"value": "",
 									"type": "default"
 								}
 							]
@@ -374,12 +380,12 @@
 							"formdata": [
 								{
 									"key": "file",
-									"value": "123/228.txt",
+									"value": "",
 									"type": "default"
 								},
 								{
 									"key": "new_file",
-									"value": "123/1488.txt",
+									"value": "",
 									"type": "default"
 								}
 							]
@@ -427,7 +433,7 @@
 							]
 						},
 						"url": {
-							"raw": "{{cloudBaseUrl}}/api/file/download?file=6MFyDlPdnLI.jpg",
+							"raw": "{{cloudBaseUrl}}/api/file/download?file=",
 							"host": [
 								"{{cloudBaseUrl}}"
 							],
@@ -439,7 +445,7 @@
 							"query": [
 								{
 									"key": "file",
-									"value": "6MFyDlPdnLI.jpg"
+									"value": ""
 								}
 							]
 						}
@@ -466,7 +472,7 @@
 							"formdata": [
 								{
 									"key": "file",
-									"value": "meme.jpg",
+									"value": "",
 									"type": "default"
 								}
 							]
@@ -490,7 +496,18 @@
 					"name": "getPublicFile",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/file/",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								""
+							]
+						}
 					},
 					"response": []
 				}
