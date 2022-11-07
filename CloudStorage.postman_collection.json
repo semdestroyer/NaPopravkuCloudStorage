@@ -1,0 +1,500 @@
+{
+	"info": {
+		"_postman_id": "30f1c65d-55eb-4662-8f48-a7f876232ff5",
+		"name": "CloudStorage",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "arseniidev@goy4.com",
+									"type": "default"
+								},
+								{
+									"key": "password",
+									"value": "12345678",
+									"type": "default"
+								},
+								{
+									"key": "password_confirmation",
+									"value": "12345678",
+									"type": "default"
+								},
+								{
+									"key": "name",
+									"value": "arsenii",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/auth/register",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "arseniidev@goy3.com",
+									"type": "default"
+								},
+								{
+									"key": "password",
+									"value": "12345678",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/auth/login",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/auth/user-profile",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"user-profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/auth/logout",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "files",
+			"item": [
+				{
+					"name": "upload",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/User/Downloads/6MFyDlPdnLI.jpg"
+								},
+								{
+									"key": "delay",
+									"value": "2022-11-07T01:47:51",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/file/upload",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "showfiles",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/file/user/files",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"user",
+								"files"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"value": "123.txt",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/file/delete/file",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"delete",
+								"file"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create directory",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "directory",
+									"value": "2",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/file/create/directory",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"create",
+								"directory"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "userFilesSize",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/file/user/size",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"user",
+								"size"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "rename",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"value": "123/228.txt",
+									"type": "default"
+								},
+								{
+									"key": "new_file",
+									"value": "123/1488.txt",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/file/rename",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"rename"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "download",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "",
+									"value": "",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/file/download?file=6MFyDlPdnLI.jpg",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"download"
+							],
+							"query": [
+								{
+									"key": "file",
+									"value": "6MFyDlPdnLI.jpg"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "generatePublicUrl",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"value": "meme.jpg",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{cloudBaseUrl}}/api/file/generate/url",
+							"host": [
+								"{{cloudBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"generate",
+								"url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getPublicFile",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

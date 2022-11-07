@@ -51,11 +51,14 @@ class FileController extends Controller
         }
         $path = Auth::user()->id . '/' . $request->file('file')->getClientOriginalName();
         if (!empty($validator->validated()['directory'])) {
-            $path = Auth::user()->id . '/' . $validator->validated()['directory'] . '/' . $request->file('file')->getClientOriginalName();
+            $path = Auth::user()->id . '/' . basename($validator->validated()['directory']) . '/' . $request->file('file')->getClientOriginalName();
         }
         if (!empty($validator->validated()['delay'])) {
-            $fileClean = new FileCleaning();
-            $fileClean->path = $path;
+            $fileClean = FileCleaning::where('path', $path)->first();
+            if (empty($fileClean)) {
+                $fileClean = new FileCleaning();
+                $fileClean->path = $path;
+            }
             $fileClean->deleteAt = date('Y-m-d H:i:s', strtotime($validator->validated()['delay']));
             $fileClean->save();
         }
@@ -84,15 +87,10 @@ class FileController extends Controller
             ], 400);
         }
 
-        if (str_contains($validator->validated()['directory'], '/')) {
-            return response()->json([
-                'result' => 'subdirectory not allowed'
-            ], 400);
-        }
-        $path = realpath($validator->validated()['directory']);
+        $path = Auth::user()->id . '/' . basename($validator->validated()['directory']);
         Storage::disk('local')->makeDirectory($path);
         return response()->json([
-            'result' => 'directory successfully uploaded'
+            'result' => 'directory successfully created'
         ]);
     }
 
@@ -126,7 +124,7 @@ class FileController extends Controller
 
 
     /**
-     * Функция для просмотра всех файлов на диске
+     * Функция для просмотра всех файлов и директорий на диске
      *
      * @return JsonResponse
      */
@@ -134,8 +132,12 @@ class FileController extends Controller
     {
         $result = [];
         $files = Storage::disk('local')->allFiles(Auth::user()->id);
+        $directories = Storage::disk('local')->allDirectories(Auth::user()->id);
         foreach ($files as $file) {
             array_push($result, substr($file, strpos($file, '/', 1)));
+        }
+        foreach ($directories as $directory) {
+            array_push($result, substr($directory, strpos($directory, '/', 1)) . '/');
         }
         return response()->json(['files' => $result]);
     }
@@ -203,11 +205,13 @@ class FileController extends Controller
             'file' => 'required|string',
         ]);
 
-
-        $fileUrl = new FileUrl();
-        $fileUrl->path = Auth::user()->id . '/' . $validator->validated()['file'];
-        $fileUrl->url = Hash::make($validator->validated()['file']);
-        $fileUrl->save();
+        $fileUrl = FileUrl::where('path', Auth::user()->id . '/' . $validator->validated()['file'])->first();
+        if (empty($fileUrl)) {
+            $fileUrl = new FileUrl();
+            $fileUrl->path = Auth::user()->id . '/' . $validator->validated()['file'];
+            $fileUrl->url = Hash::make($validator->validated()['file']);
+            $fileUrl->save();
+        }
         return response()->json([
             'result' => $fileUrl->url
         ]);
